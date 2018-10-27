@@ -1,3 +1,10 @@
+/* Devloper **CrazyDreamer and licence open source
+*             (This file is open source)
+* web-scraping-api this api is used to return meta data like title,
+* logo , description , image (if no logo) for any searched website
+* function getWebsiteDetails return these sulch value from a html
+* text given by user of request function
+*/
 var base64reg = /^data:image.*$/;
 function ValidURL(str) {
     var regex = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
@@ -9,17 +16,21 @@ function ValidURL(str) {
     }
 }
 
+function getSiteHostName(url) {
+    urlPartsRegex = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
+    host = url.match(urlPartsRegex)[4];
+    return host;
+}
+
 function getImageOnWebsite(hostname,htmlText){
   var image;
   try{
-      /*-------------Nested try if quotes matter-------------------------*/
       try{
         image = htmlText.match(/<img[^>]*?src="([^<]*?)"[^>]*?>/)[1] || null;
         image = (!image) ? (htmlText.match(/<img[^>]*?src='([^<]*?)'[^>]*?>/)[1]) : image;
       }catch(err){
         image = null;
       }
-      /*-----------------------------------------------------------------*/
   }catch(err){
     image = null
   }
@@ -27,14 +38,8 @@ function getImageOnWebsite(hostname,htmlText){
   {
     if(!(base64reg.test(image.trim())))
     {
-      if(!ValidURL(image))
-      {
-        image = image.replace(/^\//, '');
-        image = 'http://'+hostname+'/'+image;
-      }
+      image = (!ValidURL(image)) ? ( 'http://'+hostname+'/'+(image.replace(/^\//, '')) ) : image;
     }
-  } else {
-    logo = null;
   }
   return image;
 }
@@ -42,91 +47,53 @@ function getImageOnWebsite(hostname,htmlText){
 function getSiteDescription(htmlText) {
      var desc;
      try{
-       /*-------------Nested try if quotes matter-------------------------*/
        try{
          desc = htmlText.match(/<meta[^>]*?name=[^>]*?description[^>]*?content="([^<]*?)"[^>]*?>/)[1];
          desc = (!desc) ? (htmlText.match(/<meta[^>]*?name=[^>]*?description[^>]*?content='([^<]*?)'[^>]*?>/)[1]) : desc;
        }catch(err){
          desc = null;
        }
-       /*----------------------------------------------------------------*/
      }catch(err){
        desc = null;
      }
      return desc;
 }
-/*-------------------------------------------------------------------------*/
+
 function getSiteTitle(url,htmlText) {
      var title;
       try{
-        /*-------------Nested try if quotes matter-------------------------*/
-        try{
-          title = htmlText.match(/<meta[^>]*?property=[^>]*?og:title[^>]*?content="([^<]*?)"[^>]*?>/)[1] || null;
-          title = (!title) ? (htmlText.match(/<meta[^>]*?property=[^>]*?og:title[^>]*?content='([^<]*?)'[^>]*?>/)[1]) : title;
-        }catch(err){
-          title = null;
-        }
-        /*----------------------------------------------------------------*/
-      }catch(err){
-        title = null;
-      }
+          try{
+            title = htmlText.match(/<meta[^>]*?property=[^>]*?og:title[^>]*?content="([^<]*?)"[^>]*?>/)[1] || null;
+            title = (!title) ? (htmlText.match(/<meta[^>]*?property=[^>]*?og:title[^>]*?content='([^<]*?)'[^>]*?>/)[1]) : title;
+          }catch(err){ title = null; }
+      }catch(err){ title = null; }
       if(!title)
       {
-        try{
-          title = htmlText.match(/<title[^>]*?>([^<]+)<\/title>/)[1] || null;
-        }catch(err){
-          title = null;
-        }
+        try{ title = htmlText.match(/<title[^>]*?>([^<]+)<\/title>/)[1] || null;}
+        catch(err){ title = null;}
       }
       return title;
 }
-/*-------------------------------------------------------------------------*/
-function getSiteHostName(url) {
-    urlPartsRegex = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
-    host = url.match(urlPartsRegex)[4];
-    return host;
-}
-/*-------------------------------------------------------------------------*/
+
 function getSiteLogo(hostname,htmlText)
 {
   var logo;
   try{
-    /*-------------Nested try if quotes matter-------------------------*/
     try{
       logo = htmlText.match(/<meta[^>]*?property=[^>]*?og:image[^>]*?content="([^<]*?)"[^>]*?>/)[1] || null;
       logo = (!logo) ? (htmlText.match(/<meta[^>]*?property=[^>]*?og:image[^>]*?content='([^<]*?)'[^>]*?>/)[1]) : logo;
-    }catch(err){
-      logo = null;
-    }
-    /*----------------------------------------------------------------*/
-  }catch(err){
-    logo = null;
-  }
+    }catch(err){ logo = null; }
+  }catch(err){ logo = null; }
   if(!logo)
   {
     try{
-      /*-------------Nested try if quotes matter-------------------------*/
       try{
         logo = htmlText.match(/<link[^>]*?rel=[^>]*?icon[^>]*?href="([^<]*?)"[^>]*?>/)[1] || null;
         logo = (!logo) ? (htmlText.match(/<link[^>]*?rel=[^>]*?icon[^>]*?href='([^<]*?)'[^>]*?>/)[1]) : logo;
-      }catch(err){
-        logo = null;
-      }
-      /*----------------------------------------------------------------*/
-    }catch(err){
-      logo = null;
-    }
+      }catch(err){ logo = null; }
+    }catch(err){ logo = null; }
   }
-  if(logo)
-  {
-    if(!ValidURL(logo))
-    {
-      logo = logo.replace(/^\//, '');
-      logo = 'http://'+hostname+'/'+logo;
-    }
-  } else {
-    logo = null;
-  }
+  logo = logo ? ( (!ValidURL(logo)) ? ('http://'+hostname+'/'+(logo.replace(/^\//, ''))) : logo ) : logo;
   return logo;
 }
 
@@ -146,7 +113,6 @@ var getWebsiteDetails = function (url,html,callback) {
       sr.title = title;
       sr.description = description;
       sr.logo = logo;
-      console.log(hostname,'\n',imgOnWeb,'\n',description,'\n',title,'\n',logo);
       if(logo || title){
         callback(null,sr);
         return;
