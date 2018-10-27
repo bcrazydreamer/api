@@ -1,2 +1,2 @@
 # api
-api developed by bcrazydreamer
+API's developed by bcrazydreamer
