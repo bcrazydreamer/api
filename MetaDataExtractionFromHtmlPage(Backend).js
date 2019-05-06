@@ -1,4 +1,4 @@
-/* Devloper **CrazyDreamer and licence open source
+/* Developer **CrazyDreamer and licence open source
 *             (This file is open source)
 * web-scraping-api this api is used to return meta data like title,
 * logo , description , image (if no logo) for any searched website
