@@ -105,7 +105,8 @@ var getWebsiteDetails = function (url,html,callback) {
       regexCSSRemove = /<style\b[^<]*(?:(?!<\/>)<[^<]*)*<\/style>/gi;
       regexBodyRemove = /<body\b[^<]*(?:(?!<\/>)<[^<]*)*<\/body>/gi;
       html = html.replace(regexScriptRemove, "");
-      //html = html.replace(regexCSSRemove, "");
+      //can ignore css
+      html = html.replace(regexCSSRemove, "");
       html = html.replace(regexBodyRemove, "");
       description = getSiteDescription(html);
       title = getSiteTitle(url,html) || hostname;
